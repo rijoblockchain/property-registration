@@ -1,0 +1,7 @@
+fabric-samples
+
+go1.14.12.linux-amd64.tar.gz
+
+network/organizations/fabric-ca/ordererOrg
+network/organizations/fabric-ca/registrar
+network/organizations/fabric-ca/users
