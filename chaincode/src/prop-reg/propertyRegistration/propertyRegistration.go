@@ -2,14 +2,13 @@ package propertyRegistration
 
 import (
 	"fmt"
-	//"encoding/json"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"prop-reg/registrar"
 	"prop-reg/users"
 )
 
-// SmartContract provides functions for managing an Asset
+// PropertyRegistration SmartContract provides functions for managing an registrar and users smart contracts
 type PropertyRegistration struct {
 	contractapi.Contract
 }
@@ -20,23 +19,27 @@ var newRequest *registrar.Request
 var newUser *registrar.User
 var propertyDetails *registrar.Property
 
-// InitLedger adds a base set of assets to the ledger
+// InitPropertyLedger initializes the contract
 func (p *PropertyRegistration) InitPropertyLedger(ctx contractapi.TransactionContextInterface) error {
 	fmt.Println(registrarContract.InitRegistrarLedger(ctx))
 	fmt.Println(usersContract.InitUsersLedger(ctx))
 	return nil
 }
 
+// Invokes the RequestNewUser smart contract from users contract
 func (p *PropertyRegistration) RequestNewUser(ctx contractapi.TransactionContextInterface) (*registrar.Request, error) {
+	// Get the function invoking client's MSP ID
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
 		return nil, fmt.Errorf("failed getting the client's MSPID: %v", err)
 	}
 
+	// If users not calling this function, declines the transaction
 	if clientMSPID != "usersMSP" {
 		return nil, fmt.Errorf("client from org %v is not authorized to request new user", clientMSPID)
 	}
 	
+	// Records are passed in transient field to make it more secure.
 	transientMap, err := ctx.GetStub().GetTransient()
 	if err != nil {
 		return nil, fmt.Errorf("error getting transient: %v", err)
@@ -51,16 +54,15 @@ func (p *PropertyRegistration) RequestNewUser(ctx contractapi.TransactionContext
 	}
 
 	newRequest, err = usersContract.RequestNewUser(ctx, transientUserJSON)
-	//newUser, err := json.Marshal(newRequest)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %v", err)
 	}
-	fmt.Println("New Request: ")
-	fmt.Println(newRequest)
+	
 	return newRequest, nil
 	
 }
 
+// Invokes the ApproveNewUser smart contract from registrar contract
 func (p *PropertyRegistration) ApproveNewUser(ctx contractapi.TransactionContextInterface, name string, aadharNumber int) (*registrar.User, error) {
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
@@ -79,6 +81,7 @@ func (p *PropertyRegistration) ApproveNewUser(ctx contractapi.TransactionContext
 	return newUser, nil
 }
 
+// Invokes the RechargeAccount smart contract from users contract
 func (p *PropertyRegistration) RechargeAccount(ctx contractapi.TransactionContextInterface, name string, aadharNumber int, bankTransactionID string) (*registrar.User, error) {
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
@@ -97,6 +100,7 @@ func (p *PropertyRegistration) RechargeAccount(ctx contractapi.TransactionContex
 	return newUser, nil
 }
 
+// Invokes the PropertyRegistrationRequest smart contract from users contract
 func (p *PropertyRegistration) PropertyRegistrationRequest(ctx contractapi.TransactionContextInterface) (*registrar.Property, error) {
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
@@ -129,6 +133,7 @@ func (p *PropertyRegistration) PropertyRegistrationRequest(ctx contractapi.Trans
 	return propertyDetails, nil	
 }
 
+// Invokes the ApprovePropertyRegistration smart contract from registrar contract
 func (p *PropertyRegistration) ApprovePropertyRegistration(ctx contractapi.TransactionContextInterface, propertyID string) (*registrar.Property, error) {
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
@@ -147,6 +152,7 @@ func (p *PropertyRegistration) ApprovePropertyRegistration(ctx contractapi.Trans
 	return propertyDetails, nil
 }
 
+// Invokes the UpdateProperty smart contract from users contract
 func (p *PropertyRegistration) UpdateProperty(ctx contractapi.TransactionContextInterface, propertyID string, name string, aadharNumber int, status string) (*registrar.Property, error) {
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
@@ -165,6 +171,7 @@ func (p *PropertyRegistration) UpdateProperty(ctx contractapi.TransactionContext
 	return propertyDetails, nil
 }
 
+// Invokes the PurchaseProperty smart contract from users contract
 func (p *PropertyRegistration) PurchaseProperty(ctx contractapi.TransactionContextInterface, propertyID string, name string, aadharNumber int) (*registrar.Property, error) {
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
@@ -183,7 +190,7 @@ func (p *PropertyRegistration) PurchaseProperty(ctx contractapi.TransactionConte
 	return propertyDetails, nil
 }
 
-
+// Invokes the ViewUser smart contract from users contract if client is users and from registrar if client is registrar
 func (p *PropertyRegistration) ViewUser(ctx contractapi.TransactionContextInterface, name string, aadharNumber int) (*registrar.User, error) {
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
@@ -211,6 +218,7 @@ func (p *PropertyRegistration) ViewUser(ctx contractapi.TransactionContextInterf
 	return nil, nil
 }
 
+// Invokes the ViewProperty smart contract from users contract if client is users and from registrar if client is registrar
 func (p *PropertyRegistration) ViewProperty(ctx contractapi.TransactionContextInterface, propertyID string) (*registrar.Property, error) {
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {

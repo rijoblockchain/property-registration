@@ -24,7 +24,7 @@ func (u *Users) InitUsersLedger(ctx contractapi.TransactionContextInterface) err
 		return nil
 }
 
-
+// Create a new request asset for a new user
 func (u *Users) RequestNewUser(ctx contractapi.TransactionContextInterface, userRecord []byte) (*registrar.Request, error) {
 	var newRequest *registrar.Request
 	err := json.Unmarshal(userRecord, &newRequest)
@@ -43,6 +43,7 @@ func (u *Users) RequestNewUser(ctx contractapi.TransactionContextInterface, user
 
 }
 
+// Add UpgradCoins to User
 func (r *Users) RechargeAccount(ctx contractapi.TransactionContextInterface, name string, aadharNumber int, bankTransactionID string) (*registrar.User, error) {
 	var usersContract = new(Users)
 	var newUser *registrar.User
@@ -70,6 +71,7 @@ func (r *Users) RechargeAccount(ctx contractapi.TransactionContextInterface, nam
 	return newUser, nil
 }
 
+// Create a new request for new property
 func (u *Users) PropertyRegistrationRequest(ctx contractapi.TransactionContextInterface, propertyRecord []byte) (*registrar.Property, error) {
 	
 	var property *registrar.Property
@@ -90,6 +92,7 @@ func (u *Users) PropertyRegistrationRequest(ctx contractapi.TransactionContextIn
 
 }
 
+// To update the property state
 func (u *Users) UpdateProperty(ctx contractapi.TransactionContextInterface, propertyID string, name string, aadharNumber int, status string) (*registrar.Property, error) {
 
 	var users Users
@@ -122,6 +125,7 @@ func (u *Users) UpdateProperty(ctx contractapi.TransactionContextInterface, prop
 
 }
 
+// Property purchase by buyer from the seller
 func (u *Users) PurchaseProperty(ctx contractapi.TransactionContextInterface, propertyID string, name string, aadharNumber int) (*registrar.Property, error) {
 
 	var users Users
@@ -181,7 +185,7 @@ func (u *Users) PurchaseProperty(ctx contractapi.TransactionContextInterface, pr
 
 }
 
-
+// View User state
 func (r *Users) ViewUser(ctx contractapi.TransactionContextInterface, name string, aadharNumber int) (*registrar.User, error) {
 	
 	var newUser *registrar.User
@@ -205,6 +209,7 @@ func (r *Users) ViewUser(ctx contractapi.TransactionContextInterface, name strin
 		return newUser, nil
 	}
 
+// View Property state
 func (r *Users) ViewProperty(ctx contractapi.TransactionContextInterface, propertyID string) (*registrar.Property, error) {
 	var property *registrar.Property
 	
